@@ -38,12 +38,14 @@ pipeline {
 
         stage('Archive Reports') {
             steps {
-                echo 'Archiving reports...'
-                junit 'target/surefire-reports/*.xml'
-                cucumber buildStatus: 'UNSTABLE', fileIncludePattern: '**/cucumber*.json', trendsLimit: 10
-                archiveArtifacts artifacts: 'target/**', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'target/cucumber-report-html/**', fingerprint: true 
+                publishHTML(target: [ 
+                    reportDir: 'target/cucumber-report-html',
+                    reportFiles: 'cucumber-html-reports/overview-features.html',
+                    reportName: 'Cucumber HTML Report'])
             }
         }
+
     }
 
     post {
