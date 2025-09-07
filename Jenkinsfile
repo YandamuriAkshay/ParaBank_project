@@ -2,15 +2,12 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven-3.9.9'   // configure Maven in Jenkins Global Tool Config
-        jdk 'jdk-17'          // configure JDK 17 in Jenkins
-    }
-
-    environment {
-        BROWSER = "chrome"
+        maven 'Maven3'   // Make sure you have Maven installed in Jenkins (Global Tool Config)
+        jdk 'JDK11'      // Ensure JDK 11 is configured in Jenkins
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 git branch: 'main',
@@ -20,52 +17,41 @@ pipeline {
 
         stage('Sanity Tests') {
             steps {
-                echo "Running Sanity Tests..."
-                sh 'mvn clean test -Dtest=com.capstone.junit.SanityJUnitTest -Dbrowser=${BROWSER}'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
+                echo 'Running Sanity JUnit tests...'
+                sh "mvn clean test -Dtest=SanityJUnitTest -Dfile.encoding=UTF-8"
             }
         }
 
         stage('E2E Tests') {
             steps {
-                echo "Running End-to-End Tests..."
-                sh 'mvn clean test -Dtest=com.capstone.runners.EndToEndTest -Dbrowser=${BROWSER}'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
+                echo 'Running End-to-End Cucumber/TestNG tests...'
+                sh "mvn test -Dcucumber.filter.tags='@E2E' -Dfile.encoding=UTF-8"
             }
         }
 
         stage('Generate Cucumber Report') {
             steps {
-                echo "Generating Cucumber Report..."
-                // Make sure your cucumber.json is generated
-                cucumber buildStatus: 'UNSTABLE',
-                         fileIncludePattern: '**/target/cucumber-reports/*.json',
-                         sortingMethod: 'ALPHABETICAL'
+                echo 'Generating Cucumber HTML report...'
+                // If using plugin: mvn verify generates cucumber.json
+                sh "mvn verify -Dfile.encoding=UTF-8"
             }
         }
 
         stage('Archive Reports') {
             steps {
-                echo "Archiving reports..."
-                archiveArtifacts artifacts: 'target/cucumber-reports/*, target/surefire-reports/*, target/testng-results.xml', allowEmptyArchive: true
+                echo 'Archiving reports...'
+                // Archive TestNG + Cucumber + Screenshots
+                junit 'target/surefire-reports/*.xml'
+                cucumber buildStatus: 'UNSTABLE', fileIncludePattern: '**/cucumber*.json', trendsLimit: 10
+                archiveArtifacts artifacts: 'target/**', allowEmptyArchive: true
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Check test reports.'
+        always {
+            echo 'Cleaning up...'
+            cleanWs()
         }
     }
 }
