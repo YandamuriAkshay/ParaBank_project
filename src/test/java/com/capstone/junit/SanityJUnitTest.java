@@ -1,36 +1,38 @@
 package com.capstone.junit;
 
-import com.capstone.driver.DriverFactory;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.Duration;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SanityJUnitTest {
-
     private static WebDriver driver;
 
     @BeforeAll
     public static void setUp() {
-        driver = DriverFactory.getDriver();
+        // Path to chromedriver already managed by Jenkins/DriverFactory
+        driver = new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().window().maximize();
     }
 
     @Test
     @Order(1)
     public void testHomePageLoads() {
         driver.get("https://parabank.parasoft.com/parabank/index.htm");
-        String title = driver.getTitle();
-        System.out.println("Page title = " + title);
-        assertTrue(title.contains("ParaBank"), "Homepage did not load correctly");
+        Assertions.assertTrue(driver.getTitle().contains("ParaBank"));
     }
 
     @Test
     @Order(2)
     public void testLoginPanelExists() {
-        boolean loginPanelPresent = driver.findElements(By.id("loginPanel")).size() > 0;
-        assertTrue(loginPanelPresent, "Login panel not found on homepage");
+        Assertions.assertFalse(driver.findElements(By.name("username")).isEmpty(),
+                "Username field not found");
+        Assertions.assertFalse(driver.findElements(By.name("password")).isEmpty(),
+                "Password field not found");
     }
 
     @AfterAll
