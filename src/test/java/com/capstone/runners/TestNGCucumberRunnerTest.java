@@ -5,15 +5,16 @@ import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
     features = "src/test/resources/features",
-    glue = "com.example.stepdefinitions", 
+    glue = {"stepdefinitions"},
     plugin = {
         "pretty",
         "html:target/cucumber-reports/cucumber.html",
-        "json:target/cucumber-reports/cucumber.json"
-		"junit:target/cucumber-reports/cucumber.xml"
+        "json:target/cucumber.json",  
+        "junit:target/cucumber-reports/cucumber.xml"
     },
-    monochrome = true
+    monochrome = true,
+    tags = "",
+    dryRun = false
 )
-public class TestNGRunner extends AbstractTestNGCucumberTests {
-}
+public class CucumberTestRunner extends AbstractTestNGCucumberTests {
 }
