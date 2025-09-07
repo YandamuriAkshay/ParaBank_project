@@ -107,26 +107,29 @@
       </plugin>
 
       <!--  Cucumber HTML Reporting -->
-      <plugin>
-        <groupId>net.masterthought</groupId>
-        <artifactId>maven-cucumber-reporting</artifactId>
-        <version>5.7.0</version>
-        <executions>
-          <execution>
-            <id>generate-cucumber-report</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <projectName>ParaBank Automation</projectName>
-              <outputDirectory>${project.build.directory}/cucumber-html-reports</outputDirectory>
-              <cucumberOutput>${project.build.directory}/cucumber.json</cucumberOutput>
-              <skipWithNoTests>false</skipWithNoTests>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+         <plugin>
+           <groupId>net.masterthought</groupId>
+           <artifactId>maven-cucumber-reporting</artifactId>
+           <version>5.7.0</version>
+           <executions>
+             <execution>
+               <id>generate-cucumber-report</id>
+               <phase>verify</phase>
+               <goals>
+                 <goal>generate</goal>
+               </goals>
+               <configuration>
+                 <projectName>ParaBank Automation</projectName>
+                 <outputDirectory>${project.build.directory}/cucumber-html-reports</outputDirectory>
+                 <jsonFiles>
+                   <param>${project.build.directory}/cucumber.json</param>
+                 </jsonFiles>
+                 <skipWithNoTests>false</skipWithNoTests>
+               </configuration>
+             </execution>
+           </executions>
+         </plugin>
+
 
     </plugins>
   </build>
