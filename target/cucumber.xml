@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="20.371" tests="1" skipped="0" failures="0" errors="0">
+<testcase classname="Parabank End-to-End Flow" name="Run all functions in order" time="20.201">
+<system-out><![CDATA[
+Given the application is opened.............................................passed
+When user opens registration page and registers with data from sheet "Registration" row 1.passed
+Then registration should be successful......................................passed
+When user logs in with username "{registered}" and password "{registered}"..passed
+Then login result should be "success".......................................passed
+When user navigates to Accounts Overview....................................passed
+Then Accounts table should show Account, Balance, Available Amount..........passed
+When user opens a "SAVINGS" account.........................................passed
+Then "Account Opened" message should appear.................................passed
+When user transfers data from sheet "Transfer" row 1........................passed
+Then transfer result should be "success"....................................passed
+When user updates profile from sheet "UpdateProfile" row 1..................passed
+Then profile update message should be shown.................................passed
+When user applies loan from sheet "Loan" row 1..............................passed
+Then loan status should be displayed........................................passed
+]]></system-out>
+</testcase>
+</testsuite>
