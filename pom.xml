@@ -3,12 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>com.capstone</groupId>
   <artifactId>parabank-automation</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-
+  
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
@@ -17,7 +16,7 @@
     <selenium.version>4.10.0</selenium.version>
     <testng.version>7.8.0</testng.version>
   </properties>
-
+  
   <dependencies>
     <!-- Selenium -->
     <dependency>
@@ -25,7 +24,7 @@
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
     </dependency>
-
+    
     <!-- Cucumber -->
     <dependency>
       <groupId>io.cucumber</groupId>
@@ -37,7 +36,7 @@
       <artifactId>cucumber-testng</artifactId>
       <version>${cucumber.version}</version>
     </dependency>
-
+    
     <!-- TestNG -->
     <dependency>
       <groupId>org.testng</groupId>
@@ -53,14 +52,14 @@
       <version>5.10.2</version>
       <scope>test</scope>
     </dependency>
-
+    
     <!-- Apache POI (Excel support) -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>5.2.3</version>
     </dependency>
-
+    
     <!-- WebDriverManager (auto driver binaries) -->
     <dependency>
       <groupId>io.github.bonigarcia</groupId>
@@ -80,9 +79,10 @@
       <version>2.20.0</version>
     </dependency>
   </dependencies>
-
+  
   <build>
     <plugins>
+      <!-- Maven Compiler Plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -93,44 +93,84 @@
           <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
-
+      
+      <!-- Maven Surefire Plugin - UPDATED WITH FIXES -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M9</version>
         <configuration>
+          <!-- CRITICAL: Ensures JSON generation even on test failures -->
+          <testFailureIgnore>true</testFailureIgnore>
+          
+          <!-- Include both Runner classes and Test classes -->
           <includes>
+            <include>**/*Runner.java</include>
             <include>**/*Test.java</include>
           </includes>
+          
+          <!-- System properties for Cucumber plugins -->
+          <systemPropertyVariables>
+            <cucumber.plugin>json:target/cucumber.json</cucumber.plugin>
+          </systemPropertyVariables>
+          
           <argLine>-Dfile.encoding=UTF-8</argLine>
         </configuration>
       </plugin>
-
-      <!--  Cucumber HTML Reporting -->
-         <plugin>
-           <groupId>net.masterthought</groupId>
-           <artifactId>maven-cucumber-reporting</artifactId>
-           <version>5.7.0</version>
-           <executions>
-             <execution>
-               <id>generate-cucumber-report</id>
-               <phase>verify</phase>
-               <goals>
-                 <goal>generate</goal>
-               </goals>
-               <configuration>
-                 <projectName>ParaBank Automation</projectName>
-                 <outputDirectory>${project.build.directory}/cucumber-html-reports</outputDirectory>
-                 <jsonFiles>
-                   <param>${project.build.directory}/cucumber.json</param>
-                 </jsonFiles>
-                 <skipWithNoTests>false</skipWithNoTests>
-               </configuration>
-             </execution>
-           </executions>
-         </plugin>
-
-
+      
+      <!-- Maven Failsafe Plugin - For Integration Tests (Optional) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.0.0-M9</version>
+        <configuration>
+          <testFailureIgnore>true</testFailureIgnore>
+          <includes>
+            <include>**/*IT.java</include>
+            <include>**/*IntegrationTest.java</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <!-- Cucumber HTML Reporting - UPDATED WITH FIXES -->
+      <plugin>
+        <groupId>net.masterthought</groupId>
+        <artifactId>maven-cucumber-reporting</artifactId>
+        <version>5.7.0</version>
+        <executions>
+          <execution>
+            <id>generate-cucumber-report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <projectName>ParaBank Automation</projectName>
+              <outputDirectory>${project.build.directory}/cucumber-html-reports</outputDirectory>
+              <!-- Use flexible wildcard pattern for JSON files -->
+              <jsonFiles>
+                <param>**/*.json</param>
+              </jsonFiles>
+              <!-- Alternative: specify input directory -->
+              <inputDirectory>${project.build.directory}</inputDirectory>
+              <skipWithNoTests>false</skipWithNoTests>
+              <parallelTesting>false</parallelTesting>
+              <!-- Additional configuration options -->
+              <checkBuildResult>false</checkBuildResult>
+              <mergeFeaturesById>true</mergeFeaturesById>
+              <mergeFeaturesWithRetest>true</mergeFeaturesWithRetest>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
