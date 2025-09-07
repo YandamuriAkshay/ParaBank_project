@@ -3,6 +3,7 @@ package com.capstone.driver;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
@@ -23,7 +24,17 @@ public class DriverFactory {
         switch (currentBrowser) {
             case "chrome":
                 WebDriverManager.chromedriver().setup();
-                driver.set(new ChromeDriver());
+                ChromeOptions options = new ChromeOptions();
+
+                // ✅ Important for Jenkins / CI (headless mode)
+                options.addArguments("--headless=new"); // "new" for Chrome >= 109
+                options.addArguments("--no-sandbox");
+                options.addArguments("--disable-dev-shm-usage");
+                options.addArguments("--remote-allow-origins=*");
+                options.addArguments("--disable-gpu");
+                options.addArguments("--window-size=1920,1080");
+
+                driver.set(new ChromeDriver(options));
                 break;
 
             case "firefox":
@@ -40,7 +51,6 @@ public class DriverFactory {
                 throw new IllegalArgumentException("Unsupported browser: " + browser);
         }
 
-        getDriver().manage().window().maximize();
         return getDriver();
     }
 
