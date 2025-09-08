@@ -94,7 +94,7 @@
         </configuration>
       </plugin>
       
-      <!-- Maven Surefire Plugin - UPDATED WITH FIXES -->
+      <!-- Maven Surefire Plugin - FIXED JSON PATH -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -109,16 +109,16 @@
             <include>**/*Test.java</include>
           </includes>
           
-          <!-- System properties for Cucumber plugins -->
+          <!-- System properties for Cucumber plugins - FIXED PATH -->
           <systemPropertyVariables>
-            <cucumber.plugin>json:target/cucumber.json</cucumber.plugin>
+            <cucumber.plugin>json:target/cucumber-reports/cucumber.json,html:target/cucumber-reports/cucumber-html-report</cucumber.plugin>
           </systemPropertyVariables>
           
           <argLine>-Dfile.encoding=UTF-8</argLine>
         </configuration>
       </plugin>
       
-      <!-- Maven Failsafe Plugin - For Integration Tests (Optional) -->
+      <!-- Maven Failsafe Plugin - For Integration Tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -129,6 +129,10 @@
             <include>**/*IT.java</include>
             <include>**/*IntegrationTest.java</include>
           </includes>
+          <!-- Same JSON output for failsafe -->
+          <systemPropertyVariables>
+            <cucumber.plugin>json:target/cucumber-reports/cucumber-it.json</cucumber.plugin>
+          </systemPropertyVariables>
         </configuration>
         <executions>
           <execution>
@@ -140,7 +144,7 @@
         </executions>
       </plugin>
       
-      <!-- Cucumber HTML Reporting - UPDATED WITH FIXES -->
+      <!-- Cucumber HTML Reporting - FIXED CONFIGURATION -->
       <plugin>
         <groupId>net.masterthought</groupId>
         <artifactId>maven-cucumber-reporting</artifactId>
@@ -155,15 +159,19 @@
             <configuration>
               <projectName>ParaBank Automation</projectName>
               <outputDirectory>${project.build.directory}/cucumber-html-reports</outputDirectory>
-              <!-- Use flexible wildcard pattern for JSON files -->
+              <!-- FIXED: Point to the correct directory and files -->
+              <inputDirectory>${project.build.directory}/cucumber-reports</inputDirectory>
               <jsonFiles>
                 <param>**/*.json</param>
               </jsonFiles>
-              <!-- Alternative: specify input directory -->
-              <inputDirectory>${project.build.directory}</inputDirectory>
+              <!-- Backup: explicit file list if wildcard fails -->
+              <!--
+              <jsonFiles>
+                <param>${project.build.directory}/cucumber-reports/cucumber.json</param>
+              </jsonFiles>
+              -->
               <skipWithNoTests>false</skipWithNoTests>
               <parallelTesting>false</parallelTesting>
-              <!-- Additional configuration options -->
               <checkBuildResult>false</checkBuildResult>
               <mergeFeaturesById>true</mergeFeaturesById>
               <mergeFeaturesWithRetest>true</mergeFeaturesWithRetest>
